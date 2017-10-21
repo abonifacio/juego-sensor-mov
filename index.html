@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Tiempo de serpentear</title>
+    <link rel="stylesheet" href="css/photon.min.css">
+</head>
+<body>
+        <header class="toolbar toolbar-header">
+            <h1 class="title">Tiempo de serpentear</h1>
+        
+            <div class="toolbar-actions">
+                <div class="btn-group">
+                    <button class="btn btn-default">
+                    <span class="icon icon-play"></span>
+                    </button>
+                    <button class="btn btn-default">
+                    <span class="icon icon-pause"></span>
+                    </button>
+                    <button class="btn btn-default">
+                    <span class="icon icon-stop"></span>
+                    </button>
+                </div>
+                
+                <span style="margin-left:40px">
+                    Puntos: 
+                    <span id="puntos"></span>
+                </span>
+                <span style="margin-left:40px">
+                    Eficacia: 
+                    <span id="eficacia"></span>
+                </span>
+            </div>
+        </header>
+        
+        <canvas id="mainCanvas">
+            
+        </canvas>
+        
+        <footer class="toolbar toolbar-footer">
+            <div class="toolbar-actions">
+            </div>
+        </footer>
+    
+    
+    
+    <script>
+        const {ipcRenderer} = require('electron')
+        const conf = require('./conf')
+        const canvas = document.getElementById('mainCanvas')
+        const context = canvas.getContext('2d')
+        const puntosElement = document.getElementById('puntos')
+        const eficaciaElement = document.getElementById('eficacia')
+        const W = conf.width
+        const H = conf.height
+        
+        canvas.width = W
+        canvas.height = H
+        
+        window.addEventListener("keydown", onKey, true);
+        window.addEventListener("wheel", onWheel, true);
+
+        const juego = new Juego(context,sinFunc)
+
+        var Y_VALUE = 0
+
+        // ipcRenderer.on('ping', (event, arg) => {
+        //     juego.next(arg)
+        // })
+        
+        setInterval(()=>{
+            juego.next(Y_VALUE)
+        },50)
+
+
+        setInterval(()=>{
+            puntosElement.innerHTML = juego.getPuntos()
+            let ef = juego.getEficacia()
+            eficaciaElement.innerHTML = isNaN(ef) ? '-': ef.toFixed(2)+'%'
+        },1000)
+
+        function Juego(ctx,f){
+            const values = []
+            const step = 10
+            const BUFF_SIZE = W/2/step
+            const CENTER_Y = H/2
+            var T = 0 // variable de tiempo
+            var M = 0 // momento
+            var PUNTOS = 0;
+            
+            this.next = function(y){
+                values.push(CENTER_Y + y)
+                if(values.length>(BUFF_SIZE)){
+                    values.shift()
+                    if(Math.abs(y+CENTER_Y-f(T))<10){
+                        M++
+                        PUNTOS++
+                    }else{
+                        if(M>0){
+                            M--
+                        }
+                    }
+                    T+=step
+                }
+                draw(T)
+            }
+
+            this.getPuntos = function(){
+                return PUNTOS
+            }
+
+            this.getEficacia = function(){
+                return PUNTOS / (T / step) *100
+            }
+            
+            function draw(){
+                if(values.length<2) return
+                
+                drawBase(T)
+                
+                let x = 0
+                ctx.strokeStyle = '#00BCD4'
+                ctx.beginPath()
+                ctx.moveTo(x,values[0])
+                for(let i = 1;i<values.length;i++){
+                    let x_old = x
+                    x+= step
+                    let c_x = (x_old + x) / 2
+                    let c_y = (values[i-1] + values[i]) / 2
+                    ctx.quadraticCurveTo(x_old,values[i-1],c_x,c_y)
+                }
+                ctx.stroke()
+
+                if(M>0){
+                    drawPoint(x,values[values.length-1],M)
+                }
+                
+                function drawBase(startIndex){
+                    ctx.clearRect(0, 0, canvas.width, canvas.height)
+                    ctx.strokeStyle = '#F44336'
+                    ctx.beginPath()
+                    ctx.moveTo(0,f(startIndex))
+                    for(let t = 1;t<W;t++){
+                        ctx.lineTo(t,f(t+startIndex))
+                    }
+                    ctx.stroke()
+                    
+                }
+                
+                function drawPoint(x,y,r){
+                    ctx.fillStyle = 'rgba(255, 249, 196, 0.5)';
+                    ctx.beginPath();
+                    ctx.arc(x, y, r % 20, 0, Math.PI * 2, false);
+                    ctx.fill();
+                }
+
+            }
+        }
+        
+        function sinFunc(x){
+            return H/2 + 30*Math.sin(x*Math.PI/180);
+        }
+
+        function onWheel(event){
+            if(event.defaultPrevented){
+                return
+            }
+            if(event.deltaY>0){
+                Y_VALUE-=10
+            }else{
+                Y_VALUE+=10
+            }
+
+            event.preventDefault()
+        }
+
+        function onKey(event){
+            if (event.defaultPrevented) {
+                return; // Do nothing if the event was already processed
+            }
+
+            switch (event.key) {
+                case "ArrowDown":
+                Y_VALUE+=10
+                break;
+                case "ArrowUp":
+                Y_VALUE-=10
+                break;
+                break;
+                default:
+                return; // Quit when this doesn't handle the key event.
+            }
+            event.preventDefault(); // Cancel the default action to avoid it being handled twice
+        }
+    </script>
+  </body>
+</html>

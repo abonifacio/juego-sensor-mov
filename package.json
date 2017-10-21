@@ -1,0 +1,19 @@
+{
+  "name": "juego-sensor-mov",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abonifacio/juego-sensor-mov.git"
+  },
+  "author": "Augusto Bonifacio",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abonifacio/juego-sensor-mov/issues"
+  },
+  "homepage": "https://github.com/abonifacio/juego-sensor-mov#readme"
+}
