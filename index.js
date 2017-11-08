@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow,dialog} = require('electron')
 const path = require('path')
 const url = require('url')
 const sensor = require('./sensor')(onData)
@@ -9,7 +9,11 @@ const conf = require('./conf')
 let win
 
 function onData(data){
-    win.webContents.send('ping',data)
+    if(!data){
+      win.webContents.send('noMano',data)
+    }else{
+      win.webContents.send('ping',data)
+    }
 }
 
 function createWindow () {
@@ -26,7 +30,7 @@ function createWindow () {
   sensor.start()
 
   // Open the DevTools.
-//   win.webContents.openDevTools()
+  win.webContents.openDevTools()
 
   // Emitted when the window is closed.
   win.on('closed', () => {

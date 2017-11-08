@@ -67,6 +67,10 @@
         ipcRenderer.on('ping', (event, arg) => {
             juego.next(arg)
         })
+
+        ipcRenderer.on('noMano', (event, arg) => {
+            console.log('No hay mano');
+        })
         
         // setInterval(()=>{
         //     juego.next(Y_VALUE)
@@ -89,6 +93,7 @@
             var PUNTOS = 0;
             
             this.next = function(y){
+                console.log(CENTER_Y - y,'px')
                 values.push(CENTER_Y - y)
                 if(values.length>(BUFF_SIZE)){
                     values.shift()

@@ -1,11 +1,13 @@
 const SerialPort = require('serialport');
+const conf = require('./conf');
 const ByteLength = SerialPort.parsers.ByteLength;
 const portName = '\\\\.\\COM4';
 
 
 function create(onData){
     var sp = undefined;
-    
+    var error = false;
+
     function start(){
         if(sp){
             sp.resume();
@@ -19,12 +21,8 @@ function create(onData){
             });
             const parser = sp.pipe(new ByteLength({length: 4}));
             parser.on('data',function(data){
-                // onData((parseInt(data)-10)*20);
                 const dato = parseInt(data);
-                onData(dato*10);
-                // console.log(dato);
-                // console.log(data.toString('hex'));
-                // console.log(parseFloat(data));
+                onData(dato*conf.coef);
             });
             sp.on('error',console.log);
         }
@@ -35,6 +33,7 @@ function create(onData){
             sp.pause();
         }
     }
+
 
     return {
         stop:stop,

@@ -49,7 +49,7 @@ Descargar planos de conexiones en http://elprofegarcia.com/
    duracion = pulseIn(Pecho, HIGH);             // calcula la distancia en mm
  
    if(duracion<2321){
-     distancia = (duracion/2) / 29;
+     distancia = (duracion/2) / 29  ;
      espera = 10 - duracion / 1000;
      suma+=distancia;
      efectivas++;
@@ -60,7 +60,7 @@ Descargar planos de conexiones en http://elprofegarcia.com/
    vueltas++;
    if(vueltas==CANT_MUESTRAS){
      bubble_sort(historicas,CANT_MUESTRAS);
-     Serial.println(historicas[MEDIO]);
+     Serial.println(historicas[MEDIO]-10);
      for(int i;i<CANT_MUESTRAS;i++){
        historicas[i]=0;
      }
