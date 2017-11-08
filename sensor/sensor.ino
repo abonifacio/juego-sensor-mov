@@ -60,7 +60,7 @@ Descargar planos de conexiones en http://elprofegarcia.com/
    vueltas++;
    if(vueltas==CANT_MUESTRAS){
      bubble_sort(historicas,CANT_MUESTRAS);
-     Serial.println(historicas[MEDIO]-10);
+     Serial.println(historicas[MEDIO]);
      for(int i;i<CANT_MUESTRAS;i++){
        historicas[i]=0;
      }

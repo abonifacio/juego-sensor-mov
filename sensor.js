@@ -21,8 +21,8 @@ function create(onData){
             });
             const parser = sp.pipe(new ByteLength({length: 4}));
             parser.on('data',function(data){
-                const dato = parseInt(data);
-                onData(dato*conf.coef);
+                const dato = (parseInt(data)-conf.offset)*conf.coef;
+                onData(dato);
             });
             sp.on('error',console.log);
         }
