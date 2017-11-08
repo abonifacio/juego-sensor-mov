@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/abonifacio/juego-sensor-mov/issues"
   },
-  "homepage": "https://github.com/abonifacio/juego-sensor-mov#readme"
+  "homepage": "https://github.com/abonifacio/juego-sensor-mov#readme",
+  "dependencies": {
+    "serialport": "^6.0.4"
+  },
+  "devDependencies": {
+    "electron-build": "0.0.3",
+    "electron-rebuild": "^1.6.0"
+  }
 }

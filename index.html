@@ -64,13 +64,13 @@
 
         var Y_VALUE = 0
 
-        // ipcRenderer.on('ping', (event, arg) => {
-        //     juego.next(arg)
-        // })
+        ipcRenderer.on('ping', (event, arg) => {
+            juego.next(arg)
+        })
         
-        setInterval(()=>{
-            juego.next(Y_VALUE)
-        },50)
+        // setInterval(()=>{
+        //     juego.next(Y_VALUE)
+        // },50)
 
 
         setInterval(()=>{
@@ -89,7 +89,7 @@
             var PUNTOS = 0;
             
             this.next = function(y){
-                values.push(CENTER_Y + y)
+                values.push(CENTER_Y - y)
                 if(values.length>(BUFF_SIZE)){
                     values.shift()
                     if(Math.abs(y+CENTER_Y-f(T))<10){
