@@ -13,7 +13,7 @@ $ sudo apt install -y nodejs npm
 #### Instalar electron
 ```sh
 
-$ npm install -g electron
+$ npm install -g electron electron-rebuild
 
 ```
 
@@ -24,6 +24,7 @@ En la carpeta del proyecto
 ```sh
 
 $ npm install
+$ electron-rebuild
 
 ```
 

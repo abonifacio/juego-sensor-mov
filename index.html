@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <title>Tiempo de serpentear</title>
     <link rel="stylesheet" href="css/photon.min.css">
+    <style type="text/css">
+        #alert{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: rgba(255,255,255,0.8);
+            padding-top: 50%;
+            display: none;
+        }
+        #alert h1{
+            padding-top: -12px;
+            text-align: center;
+            font-size: 24px;
+        }
+    </style>
 </head>
 <body>
         <header class="toolbar toolbar-header">
@@ -32,6 +49,9 @@
                 </span>
             </div>
         </header>
+        <div id="alert">
+            <h1 id="alert-title"></h1>
+        </div>
         
         <canvas id="mainCanvas">
             
@@ -61,15 +81,43 @@
         window.addEventListener("wheel", onWheel, true);
 
         const juego = new Juego(context,sinFunc)
+        const Alert = (function(){
+            var showing = false
+            var wrapper = document.getElementById('alert')
+            var title = document.getElementById('alert-title')
+            function show(msg){
+                if(!showing){
+                    showing = true
+                    wrapper.style.display = "block"
+                    title.innerHTML = msg
+                }
+            }
+
+            function hide(){
+                if(showing){
+                    wrapper.style.display = "none"
+                    showing = false
+                }
+            }
+
+            return {
+                show:show,
+                hide:hide
+            }
+        })();
 
         var Y_VALUE = 0
 
         ipcRenderer.on('ping', (event, arg) => {
             juego.next(arg)
+            Alert.hide()
         })
 
         ipcRenderer.on('noMano', (event, arg) => {
-            console.log('No hay mano');
+            if(juego.corriendo()){
+                Alert.show('No hay mano')
+                console.log('No hay mano')
+            }
         })
         
         // setInterval(()=>{
@@ -83,6 +131,11 @@
             eficaciaElement.innerHTML = isNaN(ef) ? '-': ef.toFixed(2)+'%'
         },1000)
 
+        function Error(){
+            var showing = true;
+            show()
+        }
+
         function Juego(ctx,f){
             const values = []
             const step = 10
@@ -91,13 +144,15 @@
             var T = 0 // variable de tiempo
             var M = 0 // momento
             var PUNTOS = 0;
+            var SEGUIR = true
             
             this.next = function(y){
-                console.log(CENTER_Y - y,'px')
+                if(!SEGUIR) return
+
                 values.push(CENTER_Y - y)
                 if(values.length>(BUFF_SIZE)){
                     values.shift()
-                    if(Math.abs(y+CENTER_Y-f(T))<10){
+                    if(Math.abs(180+y-f(T))<20){
                         M++
                         PUNTOS++
                     }else{
@@ -108,6 +163,14 @@
                     T+=step
                 }
                 draw(T)
+            }
+
+            this.corriendo = function(){
+                return SEGUIR;
+            }
+
+            this.stop = function(){
+                SEGUIR = false
             }
 
             this.getPuntos = function(){
@@ -163,7 +226,21 @@
         }
         
         function sinFunc(x){
-            return H/2 + 30*Math.sin(x*Math.PI/180);
+            return H/2 - 50 + getAmplitud(x)*Math.sin(x*Math.PI/180);
+        }
+        
+        function getAmplitud(x){
+            if(x < 1800){
+                return 30
+            }else if(x<3600){
+                return 80
+            }else if(x<5400){
+                return 130
+            }else{
+                Alert.show('Fin del juego')
+                juego.stop()
+                return 0
+            }
         }
 
         function onWheel(event){

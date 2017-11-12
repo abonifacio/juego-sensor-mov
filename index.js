@@ -7,12 +7,18 @@ const conf = require('./conf')
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
-
+var contador = 0
+var ultimo = 0;
 function onData(data){
-    if(!data){
+    if(!data && contador==3){
       win.webContents.send('noMano',data)
+    }else if(!data){
+      contador++
+      win.webContents.send('ping',ultimo)
     }else{
       win.webContents.send('ping',data)
+      ultimo = data
+      contador = 0
     }
 }
 

@@ -13,8 +13,8 @@ Descargar planos de conexiones en http://elprofegarcia.com/
  
  #define Pecho 6
  #define Ptrig 7
- #define CANT_MUESTRAS 7
- #define MEDIO 3
+ #define CANT_MUESTRAS 5
+ #define MEDIO 2
  
  long duracion,espera;   
  long distancia,suma;
