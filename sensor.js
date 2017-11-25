@@ -47,4 +47,3 @@ function create(onData){
 }
 
 module.exports = create
-

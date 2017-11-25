@@ -10,7 +10,7 @@ let win
 var contador = 0
 var ultimo = 0;
 function onData(data){
-    if(!data && contador==3){
+    if(!data && contador==5){
       win.webContents.send('noMano',data)
     }else if(!data){
       contador++
@@ -36,7 +36,7 @@ function createWindow () {
   sensor.start()
 
   // Open the DevTools.
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 
   // Emitted when the window is closed.
   win.on('closed', () => {

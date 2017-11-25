@@ -25,7 +25,7 @@
 <body>
         <header class="toolbar toolbar-header">
             <h1 class="title">Tiempo de serpentear</h1>
-        
+
             <div class="toolbar-actions">
                 <div class="btn-group">
                     <button class="btn btn-default">
@@ -38,13 +38,13 @@
                     <span class="icon icon-stop"></span>
                     </button>
                 </div>
-                
+
                 <span style="margin-left:40px">
-                    Puntos: 
+                    Puntos:
                     <span id="puntos"></span>
                 </span>
                 <span style="margin-left:40px">
-                    Eficacia: 
+                    Eficacia:
                     <span id="eficacia"></span>
                 </span>
             </div>
@@ -52,18 +52,18 @@
         <div id="alert">
             <h1 id="alert-title"></h1>
         </div>
-        
+
         <canvas id="mainCanvas">
-            
+
         </canvas>
-        
+
         <footer class="toolbar toolbar-footer">
             <div class="toolbar-actions">
             </div>
         </footer>
-    
-    
-    
+
+
+
     <script>
         const {ipcRenderer} = require('electron')
         const conf = require('./conf')
@@ -73,19 +73,24 @@
         const eficaciaElement = document.getElementById('eficacia')
         const W = conf.width
         const H = conf.height
-        
+
         canvas.width = W
         canvas.height = H
-        
+
         window.addEventListener("keydown", onKey, true);
         window.addEventListener("wheel", onWheel, true);
 
-        const juego = new Juego(context,sinFunc)
+        var juego = new Juego(context,sinFunc)
+        function reset(){
+          console.log('stop');
+          juego = new Juego(context,sinFunc)
+        }
         const Alert = (function(){
             var showing = false
             var wrapper = document.getElementById('alert')
             var title = document.getElementById('alert-title')
             function show(msg){
+                console.log(msg,showing);
                 if(!showing){
                     showing = true
                     wrapper.style.display = "block"
@@ -110,7 +115,9 @@
 
         ipcRenderer.on('ping', (event, arg) => {
             juego.next(arg)
-            Alert.hide()
+            if(juego.corriendo()){
+              Alert.hide()
+            }
         })
 
         ipcRenderer.on('noMano', (event, arg) => {
@@ -119,7 +126,7 @@
                 console.log('No hay mano')
             }
         })
-        
+
         // setInterval(()=>{
         //     juego.next(Y_VALUE)
         // },50)
@@ -145,7 +152,7 @@
             var M = 0 // momento
             var PUNTOS = 0;
             var SEGUIR = true
-            
+
             this.next = function(y){
                 if(!SEGUIR) return
 
@@ -180,12 +187,12 @@
             this.getEficacia = function(){
                 return PUNTOS / (T / step) *100
             }
-            
+
             function draw(){
                 if(values.length<2) return
-                
+
                 drawBase(T)
-                
+
                 let x = 0
                 ctx.strokeStyle = '#00BCD4'
                 ctx.beginPath()
@@ -202,7 +209,7 @@
                 if(M>0){
                     drawPoint(x,values[values.length-1],M)
                 }
-                
+
                 function drawBase(startIndex){
                     ctx.clearRect(0, 0, canvas.width, canvas.height)
                     ctx.strokeStyle = '#F44336'
@@ -212,9 +219,9 @@
                         ctx.lineTo(t,f(t+startIndex))
                     }
                     ctx.stroke()
-                    
+
                 }
-                
+
                 function drawPoint(x,y,r){
                     ctx.fillStyle = 'rgba(255, 249, 196, 0.5)';
                     ctx.beginPath();
@@ -224,21 +231,24 @@
 
             }
         }
-        
+
         function sinFunc(x){
             return H/2 - 50 + getAmplitud(x)*Math.sin(x*Math.PI/180);
         }
-        
+
         function getAmplitud(x){
             if(x < 1800){
                 return 30
             }else if(x<3600){
-                return 80
+                return 50
             }else if(x<5400){
-                return 130
+                return 80
             }else{
-                Alert.show('Fin del juego')
                 juego.stop()
+                Alert.show(`Fin del juego
+                  <button onclick="reset()" class="btn btn-default">
+                  Jugar <span class="icon icon-play"></span>
+                  </button>`)
                 return 0
             }
         }
